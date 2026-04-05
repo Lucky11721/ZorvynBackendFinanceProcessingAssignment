@@ -40,7 +40,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .type(TransactionType.valueOf(request.type().toUpperCase()))
                 .category(request.category())
                 .notes(request.notes())
-                .deleted(false) // Ensure it defaults to false
+                .deleted(false)
                 .build();
 
         Transaction saved = transactionRepository.save(transaction);
@@ -55,7 +55,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .filter(t -> !t.isDeleted()) // SECURITY: Prevent updating deleted records
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found or has been deleted"));
 
-        // Use the trackBalanceService to handle the math of updating a balance
+
         trackBalanceService.updateBalanceOnCorrection(
                 existing.getAmount(),
                 request.amount(),
@@ -77,10 +77,10 @@ public class TransactionServiceImpl implements TransactionService {
                 .filter(t -> !t.isDeleted()) // SECURITY: Prevent deleting already deleted records
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found or has been deleted"));
 
-        // 1. Revert the financial balance first
+
         trackBalanceService.updateBalanceOnDeletion(existing);
 
-        // 2. Perform the manual Soft Delete
+
         existing.setDeleted(true);
         transactionRepository.save(existing);
     }
@@ -96,7 +96,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Page<TransactionalResponseDTO> getAllUserTransactions(Long userId, String category, String type, Pageable pageable) {
 
-        // Safely parse the transaction type if it is provided
+
         TransactionType transactionType = null;
         if (type != null && !type.trim().isEmpty()) {
             try {
@@ -106,15 +106,13 @@ public class TransactionServiceImpl implements TransactionService {
             }
         }
 
-        // Delegate filtering and pagination directly to the database for high performance
         return transactionRepository.findFilteredTransactions(userId, category, transactionType, pageable)
                 .map(this::mapToDTO);
     }
 
     @Override
     public DashboardSummaryDTO getDashboardSummary(Long userId) {
-        // Because we updated the TransactionRepository to include "AND t.deleted = false",
-        // these sums will automatically ignore the soft-deleted records!
+
         BigDecimal totalIncome = transactionRepository.sumAmountByUserIdAndType(userId, TransactionType.INCOME);
         BigDecimal totalExpenses = transactionRepository.sumAmountByUserIdAndType(userId, TransactionType.EXPENSE);
         BigDecimal netBalance = trackBalanceService.getCurrentBalance(userId);
@@ -129,23 +127,22 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public TransactionalResponseDTO restoreTransaction(Long transactionId) {
-        // 1. Fetch the transaction (Because we did manual soft deletes, findById still finds it!)
+
         Transaction existing = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found"));
 
-        // 2. Check if it is actually deleted
+
         if (!existing.isDeleted()) {
             throw new BadRequestException("This transaction is already active and cannot be restored.");
         }
 
-        // 3. Restore the record
+
         existing.setDeleted(false);
 
-        // 4. Re-apply the math to the Dashboard Balance!
-        // Restoring a record has the exact same mathematical effect as creating a new one.
+
         trackBalanceService.createBalance(existing);
 
-        // 5. Save and return
+
         return mapToDTO(transactionRepository.save(existing));
     }
 

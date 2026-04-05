@@ -29,7 +29,7 @@ public class Transaction {
     private TransactionType type;
 
     @Column(nullable = false)
-    private String category; // e.g., expense, grocery
+    private String category;
 
     @CreationTimestamp
     @Column(updatable = false)

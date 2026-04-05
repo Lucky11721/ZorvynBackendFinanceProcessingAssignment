@@ -15,7 +15,6 @@ public record TransactionRequestDTO(
         @NotBlank(message = "Category is required")
         String category,
 
-        // Notes are optional, so we do not add validation annotations here
         String notes
 ) {
 }

@@ -16,7 +16,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 1. Handle our custom Not Found exceptions (e.g., User not found)
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleResourceNotFoundException(
             ResourceNotFoundException ex, HttpServletRequest request) {
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    // 2. Handle our custom Bad Request exceptions (e.g., Email already exists)
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponseDTO> handleBadRequestException(
             BadRequestException ex, HttpServletRequest request) {
@@ -44,8 +44,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    // 3. Handle Validation Errors (When a DTO fails the @NotBlank or @Email checks)
-    // Interviewers love seeing this specifically handled!
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> handleValidationExceptions(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
@@ -59,13 +58,13 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
                 HttpStatus.BAD_REQUEST.value(),
                 "Validation Failed",
-                errors.toString(), // Passes the map of errors as the message
+                errors.toString(),
                 request.getRequestURI()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    // 4. Global Fallback for any other unexpected exceptions (e.g., Database goes down)
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGlobalException(
             Exception ex, HttpServletRequest request) {
@@ -84,7 +83,7 @@ public class GlobalExceptionHandler {
             BadCredentialsException ex, HttpServletRequest request) {
 
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
-                HttpStatus.UNAUTHORIZED.value(), // 401 Unauthorized is the standard for failed logins
+                HttpStatus.UNAUTHORIZED.value(),
                 "Authentication Failed",
                 "Invalid email or password. Please check your credentials and try again.",
                 request.getRequestURI()

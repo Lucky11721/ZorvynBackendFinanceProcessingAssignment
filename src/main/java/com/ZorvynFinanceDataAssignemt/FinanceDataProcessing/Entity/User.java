@@ -58,7 +58,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        // If the status is INACTIVE, lock the account!
         return "ACTIVE".equalsIgnoreCase(status);
     }
 }

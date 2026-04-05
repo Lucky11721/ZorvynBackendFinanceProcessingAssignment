@@ -22,7 +22,7 @@ public class TrackBalances {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // CHANGED: Now this belongs to the User, not a specific Transaction!
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;

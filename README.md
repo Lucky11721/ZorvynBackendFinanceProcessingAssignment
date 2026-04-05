@@ -33,6 +33,17 @@ This project prioritizes maintainability and performance through several deliber
 * **Dynamic Filtering:** Search and filter transactions dynamically by type and category.
 * **Atomic Transactions:** Spring's `@Transactional` boundaries guarantee that database writes (e.g., logging a transaction and updating a wallet balance) either succeed completely or roll back entirely, preventing orphaned data.
 
+  
+## Visual Overview Reference
+
+To maintain a clean documentation structure, full-resolution screenshots of the application's operational state are stored in the repository for technical evaluation.
+
+Please refer to the `/screenshots` folder for the following:
+
+* **Swagger UI Overview:** Demonstrates the interactive OpenAPI 3.0 documentation and the JWT "Authorize" configuration.
+* **Postman Test Suite:** Showcases various successful API calls, including the Dashboard Summary and Paginated Transaction views.
+* **Security Validation:** Screenshots confirming 403 Forbidden responses when unauthorized roles attempt to access restricted administrative endpoints.
+* **Soft Delete Verification:** Evidence of the 'deleted' flag being toggled in the database while the record remains persistent for audit trails.
 ## 5. Security Implementation
 * **Endpoint Protection:** Spring Security intercepts all incoming requests, routing them through a custom JWT authentication filter.
 * **Graceful Exception Handling:** Unauthorized attempts to access restricted endpoints are actively intercepted, returning clean `403 Forbidden` JSON responses rather than exposing stack traces.

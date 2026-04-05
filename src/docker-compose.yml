@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # 1. The MS SQL Server Database Container
+  sql-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: zorvyn-sql-db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Zorvyn@SecurePass123!
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    healthcheck:
+      # This ensures the API waits until the DB is actually ready to accept connections
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "Zorvyn@SecurePass123!", "-Q", "SELECT 1", "-No"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Your Spring Boot API Container
+  finance-api:
+    build: .
+    container_name: zorvyn-finance-api
+    ports:
+      - "8085:8085"
+    depends_on:
+      sql-db:
+        condition: service_healthy
+    environment:
+      # We override the application.properties here to point to the Docker database!
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sql-db:1433;databaseName=master;encrypt=true;trustServerCertificate=true
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=Zorvyn@SecurePass123!
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update

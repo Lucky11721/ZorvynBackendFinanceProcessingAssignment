@@ -1,0 +1,13 @@
+spring.application.name=FinanceDataProcessing
+
+server.port = 8005
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=BackendDataprocessing;encrypt=true;trustServerCertificate=true
+spring.datasource.username= your_database_username
+spring.datasource.password= your_databse_password
+spring.datasource.driver-class-name= add your driver
+
+spring.jpa.hibernate.ddl-auto= update
+spring.jpa.show-sql=true
+
+
+jwt.secret-key = create your own secret key.
